@@ -43,9 +43,7 @@ def task_scan_recent_partitions(**kwargs) -> None:
                 pipeline="airflow:nyc_taxi_monitoring",
                 component="scan_recent_partitions",
                 message=f"{len(anomalies)} anomalous partition(s)",
-                context={
-                    f"{a.year}-{a.month:02d}": a.reason for a in anomalies
-                },
+                context={f"{a.year}-{a.month:02d}": a.reason for a in anomalies},
             )
         )
 

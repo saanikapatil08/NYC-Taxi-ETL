@@ -7,8 +7,8 @@ breached, which both the Airflow task and the Dagster asset check pick up.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
 import pandas as pd
 from sqlalchemy import text
@@ -271,7 +271,9 @@ def check_staging_non_negative_fare_partition(year: int, month: int) -> CheckRes
     )
 
 
-def check_staging_distinct_zones_partition(year: int, month: int, min_zones: int = 50) -> CheckResult:
+def check_staging_distinct_zones_partition(
+    year: int, month: int, min_zones: int = 50
+) -> CheckResult:
     engine = get_engine()
     with engine.connect() as conn:
         distinct = int(

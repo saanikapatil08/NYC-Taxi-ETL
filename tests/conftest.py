@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Iterator
 from datetime import datetime, timedelta
-from typing import Iterator
 
 import numpy as np
 import pandas as pd
@@ -54,7 +54,7 @@ def _build_raw_row(pickup: datetime, *, distance: float, fare: float, total: flo
 def raw_frame() -> pd.DataFrame:
     rng = np.random.default_rng(seed=42)
     rows = []
-    for i in range(200):
+    for _ in range(200):
         pickup = datetime(2024, 3, 15, 8, 0) + timedelta(minutes=int(rng.integers(0, 60 * 24 * 14)))
         rows.append(
             _build_raw_row(

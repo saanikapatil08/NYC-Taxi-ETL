@@ -64,7 +64,7 @@ jobs:
           AIRFLOW__CORE__EXECUTOR: SequentialExecutor
           AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:///airflow.db
           AIRFLOW__CORE__DAGS_FOLDER: ${{ github.workspace }}/airflow/dags
-          PYTHONPATH: ${{ github.workspace }}
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/airflow
         run: |
           airflow db migrate
           python -c "from airflow.models import DagBag; \

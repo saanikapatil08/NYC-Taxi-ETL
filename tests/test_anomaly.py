@@ -27,9 +27,7 @@ def test_detector_flags_large_deviation(monkeypatch: pytest.MonkeyPatch) -> None
 
     get_settings.cache_clear()
 
-    result = detect_row_count_anomaly(
-        2024, 3, current_rows=200, historical=[1000, 1010, 990]
-    )
+    result = detect_row_count_anomaly(2024, 3, current_rows=200, historical=[1000, 1010, 990])
     assert result.is_anomaly is True
     assert result.deviation_pct is not None and result.deviation_pct > 0.2
 
@@ -41,9 +39,7 @@ def test_detector_passes_within_threshold(monkeypatch: pytest.MonkeyPatch) -> No
 
     get_settings.cache_clear()
 
-    result = detect_row_count_anomaly(
-        2024, 3, current_rows=1050, historical=[1000, 1010, 990]
-    )
+    result = detect_row_count_anomaly(2024, 3, current_rows=1050, historical=[1000, 1010, 990])
     assert result.is_anomaly is False
 
 

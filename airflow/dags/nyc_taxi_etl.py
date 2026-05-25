@@ -121,9 +121,7 @@ def task_load_staging(**kwargs) -> int:
     extract_result = ti.xcom_pull(task_ids="extract.download_month")
     year = extract_result["year"]
     month = extract_result["month"]
-    return stream_clean_load_staging(
-        extract_result["local_path"], year=year, month=month
-    )
+    return stream_clean_load_staging(extract_result["local_path"], year=year, month=month)
 
 
 def task_dataframe_quality(**kwargs) -> None:

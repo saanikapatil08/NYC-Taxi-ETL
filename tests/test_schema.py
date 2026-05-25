@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pandas as pd
+
 from shared.schema import validate_raw, validate_staging
 from shared.transform import clean_trips
 

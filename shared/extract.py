@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -80,10 +81,8 @@ def download_month(year: int, month: int, *, force: bool = False) -> ExtractResu
         os.replace(tmp_path, target)
     finally:
         if tmp_path.exists():
-            try:
+            with suppress(OSError):
                 tmp_path.unlink()
-            except OSError:
-                pass
 
     if bytes_written == 0:
         raise ExtractError(f"Downloaded zero bytes from {url}")

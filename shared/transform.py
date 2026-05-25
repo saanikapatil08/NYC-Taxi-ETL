@@ -53,9 +53,7 @@ def clean_trips(raw: pd.DataFrame, *, year: int, month: int) -> pd.DataFrame:
     df["payment_type"] = pd.to_numeric(df["payment_type"], errors="coerce")
 
     # Compute derived fields
-    df["trip_duration_min"] = (
-        df["dropoff_ts"] - df["pickup_ts"]
-    ).dt.total_seconds() / 60.0
+    df["trip_duration_min"] = (df["dropoff_ts"] - df["pickup_ts"]).dt.total_seconds() / 60.0
     df["trip_distance_mi"] = df["trip_distance"]
     df["trip_year"] = df["pickup_ts"].dt.year
     df["trip_month"] = df["pickup_ts"].dt.month

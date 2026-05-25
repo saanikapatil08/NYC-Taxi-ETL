@@ -62,12 +62,8 @@ def bulk_append_staging_rows(df: pd.DataFrame) -> None:
     from psycopg2.extras import execute_values
 
     cols = _STAGING_TRIP_COLS
-    rows = list(zip(*(df[c] for c in cols)))
-    stmt = (
-        "INSERT INTO staging.fct_trips ("
-        + ", ".join(cols)
-        + ") VALUES %s"
-    )
+    rows = list(zip(*(df[c] for c in cols), strict=False))
+    stmt = "INSERT INTO staging.fct_trips (" + ", ".join(cols) + ") VALUES %s"
     with pg_connection() as conn:
         with conn.cursor() as cur:
             execute_values(cur, stmt, rows, page_size=10_000)
