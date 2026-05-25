@@ -1,0 +1,75 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install CI dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-ci.txt
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Format check (black)
+        run: black --check .
+
+      - name: Run pytest
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: "5432"
+          POSTGRES_DB: taxi
+          POSTGRES_USER: taxi
+          POSTGRES_PASSWORD: taxi
+          MIN_EXPECTED_ROWS: "10"
+          ROW_COUNT_DEVIATION_PCT: "0.30"
+        run: pytest -ra
+
+  airflow-dag-parse:
+    runs-on: ubuntu-latest
+    # Airflow's install is heavy; gate it behind a separate job so unit tests
+    # don't wait on it.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Airflow with constraints
+        run: |
+          AIRFLOW_VERSION=2.9.3
+          PYTHON_VERSION=3.11
+          CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
+          python -m pip install --upgrade pip
+          pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
+          pip install -r requirements-ci.txt
+      - name: Validate DAG imports
+        env:
+          AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+          AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+          AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:///airflow.db
+          AIRFLOW__CORE__DAGS_FOLDER: ${{ github.workspace }}/airflow/dags
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          airflow db migrate
+          python -c "from airflow.models import DagBag; \
+            db = DagBag('airflow/dags', include_examples=False); \
+            assert not db.import_errors, db.import_errors; \
+            assert 'nyc_taxi_etl' in db.dag_ids; \
+            assert 'nyc_taxi_monitoring' in db.dag_ids; \
+            print('DAGs parsed:', list(db.dag_ids))"

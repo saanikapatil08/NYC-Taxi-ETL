@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+.env
+.pytest_cache/
+.ruff_cache/
+.dagster_home/
+data/*
+!data/.gitkeep
+airflow/logs/
+airflow/plugins/__pycache__/
+.DS_Store

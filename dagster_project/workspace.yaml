@@ -1,0 +1,4 @@
+load_from:
+  - python_module:
+      module_name: dagster_project.nyc_taxi.definitions
+      working_directory: /opt/project
